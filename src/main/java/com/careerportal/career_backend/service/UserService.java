@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 
 import com.careerportal.career_backend.entity.User;
 import com.careerportal.career_backend.repository.UserRepository;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +22,6 @@ public class UserService {
     private static final BCryptPasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
     private final UserRepository userRepository;
-    private final GoogleTokenService googleTokenService;
 
     //  Register (for students)
     public User registerUser(RegisterRequest request) {
@@ -84,32 +82,6 @@ public class UserService {
         }
 
         return PASSWORD_ENCODER.matches(rawPassword, storedPassword);
-    }
-
-    public User loginWithGoogle(String token, String requestedRole) throws Exception {
-        GoogleIdToken.Payload payload = googleTokenService.verify(token);
-
-        String email = normalizeEmail(String.valueOf(payload.getEmail()));
-        String googleSub = payload.getSubject();
-        String name = payload.get("name") != null
-                ? String.valueOf(payload.get("name"))
-                : email.split("@")[0];
-
-        User user = userRepository.findByGoogleSub(googleSub)
-                .or(() -> userRepository.findByEmailIgnoreCase(email))
-                .orElseGet(User::new);
-
-        if (user.getId() == null) {
-            user.setRole(parseRole(requestedRole));
-            user.setQuestionnaireCompleted(false);
-        }
-
-        user.setName(name);
-        user.setEmail(email);
-        user.setGoogleSub(googleSub);
-        user.setProvider("google");
-
-        return userRepository.save(user);
     }
 
     public List<User> getAllUsers() {

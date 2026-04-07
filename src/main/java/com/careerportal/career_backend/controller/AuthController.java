@@ -10,12 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import com.careerportal.career_backend.dto.GoogleAuthRequest;
 import com.careerportal.career_backend.dto.RegisterRequest;
 import com.careerportal.career_backend.entity.User;
 import com.careerportal.career_backend.service.UserService;
-
-import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -49,17 +46,6 @@ public class AuthController {
         }
 
         return ResponseEntity.ok(Map.of("user", userService.toUserResponse(user)));
-    }
-
-    @PostMapping("/google")
-    public ResponseEntity<?> googleAuth(@Valid @RequestBody GoogleAuthRequest request) {
-        try {
-            User user = userService.loginWithGoogle(request.getToken(), request.getRole());
-            return ResponseEntity.ok(Map.of("user", userService.toUserResponse(user)));
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "Google authentication failed", "error", ex.getMessage()));
-        }
     }
 
     @GetMapping("/users")
