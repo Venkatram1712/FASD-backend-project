@@ -26,12 +26,28 @@ public class UserService {
     private final GoogleTokenService googleTokenService;
 
     //  Register (for students)
-    public String registerUser(RegisterRequest request) {
+    public User registerUser(RegisterRequest request) {
+
+        if (request == null) {
+            throw new IllegalArgumentException("Request body is required");
+        }
+
+        if (request.getName() == null || request.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Name is required");
+        }
+
+        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
+            throw new IllegalArgumentException("Email is required");
+        }
+
+        if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
+            throw new IllegalArgumentException("Password is required");
+        }
 
         String normalizedEmail = normalizeEmail(request.getEmail());
 
         if (userRepository.findByEmailIgnoreCase(normalizedEmail).isPresent()) {
-            return "Email already exists!";
+            throw new IllegalArgumentException("Email already exists");
         }
 
         User user = new User();
@@ -44,9 +60,7 @@ public class UserService {
         // Default to STUDENT unless the provided role is valid.
         user.setRole(parseRole(request.getRole()));
 
-        userRepository.save(user);
-
-        return "User registered successfully!";
+        return userRepository.save(user);
     }
 
     // 🔹 Find user

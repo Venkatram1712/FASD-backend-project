@@ -27,9 +27,12 @@ public class AuthController {
     private UserService userService;
 
     // 🔹 Register (student)
-    @PostMapping("/register")
+    @PostMapping({ "/register", "/signup" })
     public ResponseEntity<Map<String, Object>> register(@RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(Map.of("message", userService.registerUser(request)));
+        User createdUser = userService.registerUser(request);
+        return ResponseEntity.ok(Map.of(
+                "message", "User registered successfully!",
+                "user", userService.toUserResponse(createdUser)));
     }
 
     // 🔹 Login
