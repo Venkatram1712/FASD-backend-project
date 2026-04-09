@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping({"/api/career-paths", "/api/paths"})
@@ -31,12 +32,12 @@ public class CareerPathController {
     }
 
     @PostMapping
-    public ResponseEntity<CareerPath> create(@RequestBody CareerPathRequest request) {
+    public ResponseEntity<CareerPath> create(@Valid @RequestBody CareerPathRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request));
     }
 
     @PutMapping("/{id}")
-    public CareerPath update(@PathVariable Long id, @RequestBody CareerPathRequest request) {
+    public CareerPath update(@PathVariable Long id, @Valid @RequestBody CareerPathRequest request) {
         return service.update(id, request);
     }
 

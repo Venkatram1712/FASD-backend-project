@@ -6,25 +6,29 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import com.careerportal.career_backend.dto.LoginRequest;
 import com.careerportal.career_backend.dto.RegisterRequest;
 import com.careerportal.career_backend.entity.User;
+import com.careerportal.career_backend.security.JwtService;
 import com.careerportal.career_backend.service.UserService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/auth")
 @Validated
+@RequiredArgsConstructor
 public class AuthController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final JwtService jwtService;
 
     // 🔹 Register (student)
     @PostMapping({ "/register", "/signup" })
-    public ResponseEntity<Map<String, Object>> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<Map<String, Object>> register(@Valid @RequestBody RegisterRequest request) {
         User createdUser = userService.registerUser(request);
         return ResponseEntity.ok(Map.of(
                 "message", "User registered successfully!",
@@ -33,7 +37,7 @@ public class AuthController {
 
     // 🔹 Login
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody RegisterRequest request) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
 
         User user = userService.findByEmail(request.getEmail());
 
@@ -45,7 +49,12 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Wrong password"));
         }
 
-        return ResponseEntity.ok(Map.of("user", userService.toUserResponse(user)));
+        String token = jwtService.generateToken(user);
+        return ResponseEntity.ok(Map.of(
+                "token", token,
+                "tokenType", "Bearer",
+                "expiresAt", jwtService.calculateExpirationInstant().toString(),
+                "user", userService.toUserResponse(user)));
     }
 
     @GetMapping("/users")

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping({"/api/resources", "/api/career-resources"})
@@ -33,12 +34,12 @@ public class CareerResourceController {
     }
 
     @PostMapping
-    public ResponseEntity<CareerResource> createResource(@RequestBody CareerResourceRequest request) {
+    public ResponseEntity<CareerResource> createResource(@Valid @RequestBody CareerResourceRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.createResource(request));
     }
 
     @PutMapping("/{id}")
-    public CareerResource updateResource(@PathVariable Long id, @RequestBody CareerResourceRequest request) {
+    public CareerResource updateResource(@PathVariable Long id, @Valid @RequestBody CareerResourceRequest request) {
         return service.updateResource(id, request);
     }
 
@@ -56,7 +57,7 @@ public class CareerResourceController {
     @PostMapping("/{resourceId}/contents")
     public ResponseEntity<ResourceContent> createContent(
             @PathVariable Long resourceId,
-            @RequestBody ResourceContentRequest request) {
+            @Valid @RequestBody ResourceContentRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.createContent(resourceId, request));
     }
 
@@ -64,7 +65,7 @@ public class CareerResourceController {
     public ResourceContent updateContent(
             @PathVariable Long resourceId,
             @PathVariable Long contentId,
-            @RequestBody ResourceContentRequest request) {
+            @Valid @RequestBody ResourceContentRequest request) {
         return service.updateContent(resourceId, contentId, request);
     }
 
