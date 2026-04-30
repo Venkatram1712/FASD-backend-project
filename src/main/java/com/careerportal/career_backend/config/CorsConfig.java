@@ -13,6 +13,7 @@ public class CorsConfig implements WebMvcConfigurer {
             .allowedOriginPatterns(
                 "https://carrerguidess.netlify.app",
                 "https://careerguidess.netlify.app",
+                "https://*.vercel.app",
                 "http://localhost:*",
                 "http://127.0.0.1:*")
                 .allowedMethods("*")
